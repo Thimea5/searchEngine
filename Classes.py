@@ -1,6 +1,3 @@
-# Correction de G. Poux-Médard, 2021-2022
-
-# =============== 2.1 : La classe Document ===============
 class Document:
     # Initialisation des variables de la classe
     def __init__(self, titre="", auteur="", date="", url="", texte=""):
@@ -10,7 +7,6 @@ class Document:
         self.url = url
         self.texte = texte
 
-# =============== 2.2 : REPRESENTATIONS ===============
     # Fonction qui renvoie le texte à afficher lorsqu'on tape repr(classe)
     def __repr__(self):
         return f"Titre : {self.titre}\tAuteur : {self.auteur}\tDate : {self.date}\tURL : {self.url}\tTexte : {self.texte}\t"
@@ -20,14 +16,12 @@ class Document:
         return f"{self.titre}, par {self.auteur}"
 
 
-
-# =============== 2.4 : La classe Author ===============
 class Author:
     def __init__(self, name):
         self.name = name
         self.ndoc = 0
         self.production = []
-# =============== 2.5 : ADD ===============
+        
     def add(self, production):
         self.ndoc += 1
         self.production.append(production)

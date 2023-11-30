@@ -1,4 +1,3 @@
-
 import praw
 import urllib, urllib.request
 import xmltodict
@@ -7,17 +6,6 @@ import datetime
 from Corpus import Corpus
 from Classes import Document
 from Classes import Author
-
-# Fonction affichage hiérarchie dict
-def showDictStruct(d):
-    def recursivePrint(d, i):
-        for k in d:
-            if isinstance(d[k], dict):
-                print("-"*i, k)
-                recursivePrint(d[k], i+2)
-            else:
-                print("-"*i, k, ":", d[k])
-    recursivePrint(d, 1)
 
 # Connexion à l'API REDDIT
 reddit = praw.Reddit(client_id='k9t9Uh4CiOx2YbY1Fq1o4g', client_secret='WaaCVpa9njLgkCD1eOfwQo-OBS_sow', user_agent='td3Python')
@@ -30,21 +18,6 @@ hot_posts = reddit.subreddit('space').hot(limit=limit)#.top("all", limit=limit)#
 docs = []
 docs_bruts = []
 afficher_cles = False
-for i, post in enumerate(hot_posts):
-    if i%10==0: print("Reddit:", i, "/", limit)
-    if afficher_cles:  # Pour connaître les différentes variables et leur contenu
-        for k, v in post.__dict__.items():
-            pass
-            print(k, ":", v)
-
-    if post.selftext != "":  # Osef des posts sans texte
-        pass
-        #print(post.selftext)
-    docs.append(post.selftext.replace("\n", " "))
-    docs_bruts.append(("Reddit", post))
-
-#print(docs)
-
 
 # Paramètres
 query_terms = ["clustering", "Dirichlet"]
@@ -57,29 +30,21 @@ data = urllib.request.urlopen(url)
 # Format dict (OrderedDict)
 data = xmltodict.parse(data.read().decode('utf-8'))
 
-#showDictStruct(data)
-
 # Ajout résumés à la liste
 for i, entry in enumerate(data["feed"]["entry"]):
-    if i%10==0: print("ArXiv:", i, "/", limit)
     docs.append(entry["summary"].replace("\n", ""))
     docs_bruts.append(("ArXiv", entry))
-    #showDictStruct(entry)
 
-# =============== 1.3 : Exploitation ===============
-print(f"# docs avec doublons : {len(docs)}")
+# =============== 1.3 : Exploitation ==============
 docs = list(set(docs))
-print(f"# docs sans doublons : {len(docs)}")
 
 for i, doc in enumerate(docs):
-    print(f"Document {i}\t# caractères : {len(doc)}\t# mots : {len(doc.split(' '))}\t# phrases : {len(doc.split('.'))}")
-    if len(doc)<100:
+    #print(f"Document {i}\t# caractères : {len(doc)}\t# mots : {len(doc.split(' '))}\t# phrases : {len(doc.split('.'))}")
+    if len(doc)<20 :
         docs.remove(doc)
 
 longueChaineDeCaracteres = " ".join(docs)
 
-# =============== PARTIE 2 =============
-# =============== 2.3 : MANIPS ===============
 collection = []
 for nature, doc in docs_bruts:
     if nature == "ArXiv":  # Les fichiers de ArXiv ou de Reddit sont pas formatés de la même manière à ce stade.
@@ -97,7 +62,6 @@ for nature, doc in docs_bruts:
         collection.append(doc_classe)  # Ajout du Document à la liste.
 
     elif nature == "Reddit":
-        #print("".join([f"{k}: {v}\n" for k, v in doc.__dict__.items()]))
         titre = doc.title.replace("\n", '')
         auteur = str(doc.author)
         date = datetime.datetime.fromtimestamp(doc.created).strftime("%Y/%m/%d")
@@ -113,7 +77,6 @@ id2doc = {}
 for i, doc in enumerate(collection):
     id2doc[i] = doc.titre
 
-# =============== 2.6 : DICT AUTEURS ===============
 authors = {}
 aut2id = {}
 num_auteurs_vus = 0
@@ -127,8 +90,6 @@ for doc in collection:
 
     authors[aut2id[doc.auteur]].add(doc.texte)
 
-
-# =============== 2.7, 2.8 : CORPUS ===============
 corpus = Corpus("Mon corpus")
 
 # Construction du corpus à partir des documents
@@ -138,7 +99,6 @@ for doc in collection:
 #print(repr(corpus))
 
 
-# =============== 2.9 : SAUVEGARDE ===============
 # Ouverture d'un fichier, puis écriture avec pickle
 with open("corpus.pkl", "wb") as f:
     pickle.dump(corpus, f)
@@ -151,7 +111,7 @@ with open("corpus.pkl", "rb") as f:
     corpus = pickle.load(f)
 
 # La variable est réapparue
-print(corpus)
+#print(corpus)
 
 
 
