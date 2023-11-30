@@ -35,7 +35,6 @@ for i, entry in enumerate(data["feed"]["entry"]):
     docs.append(entry["summary"].replace("\n", ""))
     docs_bruts.append(("ArXiv", entry))
 
-# =============== 1.3 : Exploitation ==============
 docs = list(set(docs))
 
 for i, doc in enumerate(docs):
@@ -110,8 +109,7 @@ del corpus
 with open("corpus.pkl", "rb") as f:
     corpus = pickle.load(f)
 
-# La variable est réapparue
-#print(corpus)
+print(corpus.authors)
 
 
 
