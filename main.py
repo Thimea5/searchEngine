@@ -6,22 +6,28 @@ import datetime
 from Corpus import Corpus
 from Classes import Document
 from Classes import Author
+from Classes import RedditDocument
+from Classes import ArxivDocument
 
 # Connexion à l'API REDDIT
 reddit = praw.Reddit(client_id='k9t9Uh4CiOx2YbY1Fq1o4g', client_secret='WaaCVpa9njLgkCD1eOfwQo-OBS_sow', user_agent='td3Python')
 
 # limite et sujet de la requête
-limit = 100
-hot_posts = reddit.subreddit('space').hot(limit=limit)#.top("all", limit=limit)#
+subjct = reddit.subreddit('space')
+textes_Reddit = []
+docs_bruts = []
+
+for post in subjct.hot(limit=2):
+    docs_bruts.append(("Reddit", post))
 
 # Récupération du texte
 docs = []
-docs_bruts = []
+
 afficher_cles = False
 
 # Paramètres
 query_terms = ["clustering", "Dirichlet"]
-max_results = 50
+max_results = 2
 
 # Requête ARXIV
 url = f'http://export.arxiv.org/api/query?search_query=all:{"+".join(query_terms)}&start=0&max_results={max_results}'
@@ -54,10 +60,11 @@ for nature, doc in docs_bruts:
             authors = ", ".join([a["name"] for a in doc["author"]])  # On fait une liste d'auteurs, séparés par une virgule
         except:
             authors = doc["author"]["name"]  # Si l'auteur est seul, pas besoin de liste
+
         summary = doc["summary"].replace("\n", "")  # On enlève les retours à la ligne
         date = datetime.datetime.strptime(doc["published"], "%Y-%m-%dT%H:%M:%SZ").strftime("%Y/%m/%d")  # Formatage de la date en année/mois/jour avec librairie datetime
-
-        doc_classe = Document(titre, authors, date, doc["id"], summary)  # Création du Document
+    
+        doc_classe = ArxivDocument(titre, authors, date, doc["id"], summary)  # Création du Document
         collection.append(doc_classe)  # Ajout du Document à la liste.
 
     elif nature == "Reddit":
@@ -66,9 +73,9 @@ for nature, doc in docs_bruts:
         date = datetime.datetime.fromtimestamp(doc.created).strftime("%Y/%m/%d")
         url = "https://www.reddit.com/"+doc.permalink
         texte = doc.selftext.replace("\n", "")
+        nb_commentaires = doc.num_comments
 
-        doc_classe = Document(titre, auteur, date, url, texte)
-
+        doc_classe = RedditDocument(titre, auteur, date, url, texte, nb_commentaires)
         collection.append(doc_classe)
 
 # Création de l'index de documents
@@ -95,7 +102,7 @@ corpus = Corpus("Mon corpus")
 for doc in collection:
     corpus.add(doc)
 #corpus.show(tri="abc")
-#print(repr(corpus))
+print(repr(corpus))
 
 
 # Ouverture d'un fichier, puis écriture avec pickle
@@ -109,9 +116,7 @@ del corpus
 with open("corpus.pkl", "rb") as f:
     corpus = pickle.load(f)
 
-print(corpus.authors)
-
-
+#print(corpus)
 
 
 

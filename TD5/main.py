@@ -26,6 +26,5 @@ for post in subr.hot(limit=1):
 arxiv_doc = ArxivDocument(titre="Titre Arxiv", auteur="Auteur Principal", date="2023-11-30", url="http://arxiv.org", texte="Contenu Arxiv", coauteurs=["Coauteur1", "Coauteur2", "Coauteur3"])
 
 corpus.ajouter_document(reddit_doc)
-corpus.ajouter_document(arxiv_doc)
 
-#corpus.afficher_corpus()
+corpus.afficher_corpus()
