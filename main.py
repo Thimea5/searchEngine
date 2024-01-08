@@ -8,6 +8,8 @@ from Classes import Document
 from Classes import Author
 from Classes import RedditDocument
 from Classes import ArxivDocument
+from factory import RedditCorpusGenerator
+from factory import ArxivCorpusGenerator
 
 # Connexion à l'API REDDIT
 reddit = praw.Reddit(client_id='k9t9Uh4CiOx2YbY1Fq1o4g', client_secret='WaaCVpa9njLgkCD1eOfwQo-OBS_sow', user_agent='td3Python')
@@ -118,3 +120,23 @@ with open("corpus.pkl", "rb") as f:
 
 #voir le corpus
 print(repr(corpus))
+
+
+
+# Client utilisant le générateur de corpus
+def generate_corpus(generator, name):
+    return generator.create_corpus(name)
+
+#reddit_generator = RedditCorpusGenerator()
+#arxiv_generator = ArxivCorpusGenerator()
+
+#reddit_corpus = reddit_generator.create_corpus("RedditCorpus")
+#arxiv_corpus = arxiv_generator.create_corpus("ArxivCorpus")
+
+#print("voici le reddit corpus")
+#print(repr(reddit_corpus))
+
+#print("voici le arxivCorpus corpus")
+#print(repr(arxiv_corpus))
+
+#On voit donc que le singleton fonctionne correctement puisque la factory créer des instance de corpus mais il n'y en a qu'une qui est gardée

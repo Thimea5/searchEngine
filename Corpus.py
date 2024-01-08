@@ -1,5 +1,6 @@
+# Corpus.py
 from Classes import Author
-from Classes import Singleton
+from singleton import Singleton
 
 class Corpus(metaclass=Singleton):
     def __init__(self, nom):
@@ -34,7 +35,3 @@ class Corpus(metaclass=Singleton):
         docs = list(sorted(docs, key=lambda x: x.titre.lower()))
 
         return "\n".join(list(map(str, docs)))
-
-
-
-
