@@ -1,6 +1,7 @@
 from Classes import Author
+from Classes import Singleton
 
-class Corpus:
+class Corpus(metaclass=Singleton):
     def __init__(self, nom):
         self.nom = nom
         self.authors = {}

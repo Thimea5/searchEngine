@@ -102,7 +102,7 @@ corpus = Corpus("Mon corpus")
 for doc in collection:
     corpus.add(doc)
 #corpus.show(tri="abc")
-print(repr(corpus))
+
 
 
 # Ouverture d'un fichier, puis écriture avec pickle
@@ -116,10 +116,5 @@ del corpus
 with open("corpus.pkl", "rb") as f:
     corpus = pickle.load(f)
 
-#print(corpus)
-
-
-
-
-
-
+#voir le corpus
+print(repr(corpus))
