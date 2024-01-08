@@ -26,7 +26,7 @@ docs = []
 afficher_cles = False
 
 # Paramètres
-query_terms = ["clustering", "Dirichlet"]
+query_terms = ["space"]
 max_results = 2
 
 # Requête ARXIV

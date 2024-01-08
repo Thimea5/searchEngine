@@ -60,7 +60,7 @@ class ArxivDocument(Document):
 
     def __str__(self):
         parent_str = super().__str__()
-        authors_str = ', '.join(self.author)
-        return f"{parent_str}\nAuthor and co-authors : {authors_str}\n"
+        #authors_str = ', '.join(self.author)
+        return f"{parent_str}\nAuthor and co-authors : {self.author}\n"
 
 
