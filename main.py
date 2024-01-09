@@ -150,3 +150,9 @@ resSearchWord = corpus.search(testSearchWord)
 print('resultat de la recherche du mot ' + testSearchWord)
 for doc in resSearchWord:
     print("\n - " + repr(doc))
+
+#recherche par concordance
+testConcoWord = "Fock"
+print('\nresultat de la concordance du mot ' + testConcoWord)
+concordance_result = corpus.concordance("space")
+print(concordance_result)

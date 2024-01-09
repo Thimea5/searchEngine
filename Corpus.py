@@ -2,6 +2,7 @@
 from Classes import Author
 from singleton import Singleton
 import re
+import pandas as pd
 
 class Corpus(metaclass=Singleton):
     def __init__(self, nom):
@@ -50,3 +51,31 @@ class Corpus(metaclass=Singleton):
                 matching_docs.append(doc)
 
         return matching_docs
+    
+    def concordance(self, keyword, context_size=50):
+        if not hasattr(self, 'full_text'):
+            self.full_text = " ".join(doc.texte for doc in self.id2doc.values())
+
+        # Utiliser la fonction finditer de re pour obtenir tous les passages contenant le mot-clé
+        matches = re.finditer(fr'\b{re.escape(keyword)}\b', self.full_text, flags=re.IGNORECASE)
+
+        # Extraire les indices des documents correspondants
+        matching_doc_indices = [match.start() for match in matches]
+
+        # Initialiser une liste pour stocker les résultats
+        concordance_results = []
+
+        # Construire la concordance pour chaque index
+        for index in matching_doc_indices:
+            # Extraire le contexte gauche et droit du mot-clé
+            context_left = self.full_text[max(0, index - context_size):index]
+            context_right = self.full_text[index + len(keyword):index + len(keyword) + context_size]
+
+            # Ajouter le résultat à la liste
+            concordance_results.append((context_left, keyword, context_right))
+
+        # Convertir la liste en un tableau pandas pour une meilleure représentation
+        columns = ['Contexte Gauche', 'Motif Trouvé', 'Contexte Droit']
+        concordance_df = pd.DataFrame(concordance_results, columns=columns)
+
+        return concordance_df
