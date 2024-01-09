@@ -1,6 +1,7 @@
 # Corpus.py
 from Classes import Author
 from singleton import Singleton
+import re
 
 class Corpus(metaclass=Singleton):
     def __init__(self, nom):
@@ -35,3 +36,17 @@ class Corpus(metaclass=Singleton):
         docs = list(sorted(docs, key=lambda x: x.titre.lower()))
 
         return "\n".join(list(map(str, docs)))
+    
+    def search(self, keyword):
+        matching_docs = []
+
+        keyword_pattern = re.compile(fr'\b{re.escape(keyword)}\b', flags=re.IGNORECASE)
+
+        for index, doc in self.id2doc.items():
+            title_matches = keyword_pattern.search(doc.titre)
+            text_matches = keyword_pattern.search(doc.texte)
+
+            if title_matches or text_matches:
+                matching_docs.append(doc)
+
+        return matching_docs

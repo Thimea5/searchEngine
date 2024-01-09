@@ -43,7 +43,7 @@ class RedditDocument(Document):
 
     def __str__(self):
         parent_str = super().__str__()
-        return f"{parent_str}\nNombre de commentaires : {self.nb_commentaires}"
+        return f"{parent_str}\nNombre de commentaires : {self.nb_commentaires}\n"
     
 
 class ArxivDocument(Document):

@@ -140,3 +140,13 @@ def generate_corpus(generator, name):
 #print(repr(arxiv_corpus))
 
 #On voit donc que le singleton fonctionne correctement puisque la factory créer des instance de corpus mais il n'y en a qu'une qui est gardée
+
+##### TD6 #####
+
+#recherche par mot clé (en gros si un docuement contient le mot clé, on le garde et on l'affiche avec la fonction search)
+testSearchWord = "Fock"
+resSearchWord = corpus.search(testSearchWord)
+
+print('resultat de la recherche du mot ' + testSearchWord)
+for doc in resSearchWord:
+    print("\n - " + repr(doc))
