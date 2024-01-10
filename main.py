@@ -284,12 +284,12 @@ root.configure(bg="#201c1c")
 
 subject = tk.Entry(root,width=45, bg="black", fg="green")
 subject.place(x=17, y=60) 
-label = tk.Label(root, bg="#201c1c", fg="green", text="Entrée le sujet de rechercher")
+label = tk.Label(root, bg="#201c1c", fg="green", text="Entrer le sujet à rechercher")
 label.place(x=17, y=40)
 
 keyWords = tk.Entry(root,width=45, bg="black", fg="green")
 keyWords.place(x=17, y=100) 
-label = tk.Label(root, bg="#201c1c", fg="green", text="Entrée les mots clés (séparer par des virugles)")
+label = tk.Label(root, bg="#201c1c", fg="green", text="Entrer les mots clés (séparées par des virugles)")
 label.place(x=17, y=80)
 
 
