@@ -26,7 +26,7 @@ def generateCorpus(subject, keyword):
     textes_Reddit = []
     docs_bruts = []
 
-    for post in subjct.hot(limit=100):
+    for post in subjct.hot(limit=150):
         docs_bruts.append(("Reddit", post))
 
     # Récupération du texte
@@ -36,7 +36,7 @@ def generateCorpus(subject, keyword):
 
     # Paramètres
     query_terms = [subject]
-    max_results = 50
+    max_results = 100
 
     # Requête ARXIV
     url = f'https://export.arxiv.org/api/query?search_query=all:{"+".join(query_terms)}&start=0&max_results={max_results}'
