@@ -10,6 +10,7 @@ from Classes import RedditDocument
 from Classes import ArxivDocument
 from factory import RedditCorpusGenerator
 from factory import ArxivCorpusGenerator
+import pandas as pd
 
 # Connexion à l'API REDDIT
 reddit = praw.Reddit(client_id='k9t9Uh4CiOx2YbY1Fq1o4g', client_secret='WaaCVpa9njLgkCD1eOfwQo-OBS_sow', user_agent='td3Python')
@@ -32,7 +33,7 @@ query_terms = ["space"]
 max_results = 2
 
 # Requête ARXIV
-url = f'http://export.arxiv.org/api/query?search_query=all:{"+".join(query_terms)}&start=0&max_results={max_results}'
+url = f'https://export.arxiv.org/api/query?search_query=all:{"+".join(query_terms)}&start=0&max_results={max_results}'
 data = urllib.request.urlopen(url)
 
 # Format dict (OrderedDict)
@@ -106,7 +107,6 @@ for doc in collection:
 #corpus.show(tri="abc")
 
 
-
 # Ouverture d'un fichier, puis écriture avec pickle
 with open("corpus.pkl", "wb") as f:
     pickle.dump(corpus, f)
@@ -120,8 +120,6 @@ with open("corpus.pkl", "rb") as f:
 
 #voir le corpus
 print(repr(corpus))
-
-
 
 # Client utilisant le générateur de corpus
 def generate_corpus(generator, name):
@@ -143,7 +141,7 @@ def generate_corpus(generator, name):
 
 ##### TD6 #####
 
-#recherche par mot clé (en gros si un docuement contient le mot clé, on le garde et on l'affiche avec la fonction search)
+#recherche par mot clé (donc si un docuement contient le mot clé, on le garde et on l'affiche avec la fonction search)
 testSearchWord = "Fock"
 resSearchWord = corpus.search(testSearchWord)
 
@@ -156,3 +154,30 @@ testConcoWord = "Fock"
 print('\nresultat de la concordance du mot ' + testConcoWord)
 concordance_result = corpus.concordance("space")
 print(concordance_result)
+
+#partie 2
+#2.1 (test de la fonction text_cleaner)
+text_test = "Ceci est un exemple de texte\navec des chiffres 123 et de la ponctuation !"
+texte_nettoye = corpus.text_cleaner(text_test)
+#print(texte_nettoye)
+
+#2.2 (stocker le vocabulaiee en bouclant sur les docs du corpus)
+voc = corpus.build_vocabulaire()
+#print(voc)
+
+#2.3 compter les occurences de chaque mot
+word_count = corpus.count_word_occurrences(voc)
+
+dfWord = pd.DataFrame(list(word_count.items()), columns=['Mot', 'Occurrences'])
+dfWord = dfWord.sort_values(by='Occurrences', ascending=False)
+#print("\ndfWord  : \n")
+#print(dfWord)
+
+#2.4 
+word_count_df = corpus.count_word_occurrences_with_document_frequency(voc)
+
+# Créez un DataFrame à partir du dictionnaire de fréquence des mots
+freq = pd.DataFrame(list(word_count_df.items()), columns=['Mot', 'Occurrences'])
+freq = freq.sort_values(by='Occurrences', key=lambda x: x.apply(lambda y: y['term freq']), ascending=False)
+print("\ndfWordDF : \n")
+print(freq)

@@ -56,26 +56,63 @@ class Corpus(metaclass=Singleton):
         if not hasattr(self, 'full_text'):
             self.full_text = " ".join(doc.texte for doc in self.id2doc.values())
 
-        # Utiliser la fonction finditer de re pour obtenir tous les passages contenant le mot-clé
         matches = re.finditer(fr'\b{re.escape(keyword)}\b', self.full_text, flags=re.IGNORECASE)
-
-        # Extraire les indices des documents correspondants
+        # prendre les indices
         matching_doc_indices = [match.start() for match in matches]
-
-        # Initialiser une liste pour stocker les résultats
         concordance_results = []
-
-        # Construire la concordance pour chaque index
         for index in matching_doc_indices:
-            # Extraire le contexte gauche et droit du mot-clé
+            # prendre le contexte gauche et droit du mot-clé
             context_left = self.full_text[max(0, index - context_size):index]
             context_right = self.full_text[index + len(keyword):index + len(keyword) + context_size]
-
-            # Ajouter le résultat à la liste
             concordance_results.append((context_left, keyword, context_right))
-
-        # Convertir la liste en un tableau pandas pour une meilleure représentation
         columns = ['Contexte Gauche', 'Motif Trouvé', 'Contexte Droit']
         concordance_df = pd.DataFrame(concordance_results, columns=columns)
 
         return concordance_df
+    
+    def text_cleaner(self, texte):
+        texte = texte.lower()
+
+        # Remplacer les passages à la ligne par un espace
+        texte = texte.replace("\n", " ")
+
+        # Supprimer la ponctuation
+        texte = re.sub(r'[^\w\s]', '', texte)
+
+        # Supprimer les chiffres
+        texte = re.sub(r'\d', '', texte)
+
+        return texte
+    
+    def build_vocabulaire(self):
+        vocabulary = set()
+        for doc in self.id2doc.values():
+            text = self.text_cleaner(doc.texte)
+            words = text.split()  # Utilisez la fonction split pour diviser le texte en mots
+            cleaned_words = [self.text_cleaner(word) for word in words]
+            vocabulary.update(cleaned_words)  # Mise à jour de l'ensemble de vocabulaire avec les mots du document
+        return vocabulary
+
+    #td6 2.3
+    def count_word_occurrences(self, vocabulary):
+        word_counts = {word: 0 for word in vocabulary}
+        for doc in self.id2doc.values():
+            words = doc.texte.split()
+            cleaned_words = [self.text_cleaner(word) for word in words]
+            for word in cleaned_words:
+                if word in word_counts:
+                    word_counts[word] += 1
+        return word_counts
+
+
+    #2.4
+    def count_word_occurrences_with_document_frequency(self, vocabulary):
+        word_counts = {word: {'term freq': 0, 'document freq': 0} for word in vocabulary}
+        for doc in self.id2doc.values():
+            words = doc.texte.split()
+            cleaned_words = [self.text_cleaner(word) for word in words]
+            for word in set(cleaned_words):  # Utilisez un ensemble pour éviter de compter plusieurs fois le même mot dans un même document
+                if word in word_counts:
+                    word_counts[word]['term freq'] += cleaned_words.count(word)  # Utilisez cleaned_words au lieu de words
+                    word_counts[word]['document freq'] += 1
+        return word_counts
