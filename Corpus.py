@@ -104,7 +104,7 @@ class Corpus(metaclass=Singleton):
                 else:
                     vocab[word]['total_occurrences'] += count
 
-        # Trier le dictionnaire par ordre alphabétique des mots
+        #on trie le dictionnaire par ordre alphabétique des mots
         vocab = dict(sorted(vocab.items()))
 
         return vocab

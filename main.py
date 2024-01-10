@@ -225,14 +225,10 @@ for word, info in vocab.items():
 index = 6
 w = next((mot for mot, info in vocab.items() if info['id'] == index), None)
 
-
-
 #part 2
-
-# Étape 1 : Demander à l'utilisateur d'entrer quelques mots-clés
 user_query = input("Entrez quelques mots-clés pour votre recherche : ")
 
-# Étape 2 : Transformer les mots-clés en un vecteur sur le vocabulaire précédemment construit
+#mot clé -> vecteur
 user_query_cleaned = corpus.text_cleaner(user_query)
 user_query_vector = np.zeros(len(voc))
 
@@ -240,14 +236,15 @@ for word in user_query_cleaned.split():
     if word in voc:
         user_query_vector[voc[word]['id'] - 1] += 1  # Les indices de vocabulaire commencent à 1
 
-# Étape 3 : Calculer la similarité entre le vecteur de requête et tous les documents
+#similarité entre le vecteur de requete et tous les documents
 document_vectors = corpus.build_tf_matrix(voc)
 similarity_scores = cosine_similarity(user_query_vector.reshape(1, -1), document_vectors).flatten()
 
-# Étape 4 : Trier les scores résultants et afficher les meilleurs résultats
+#trier les scores résultants et afficher les meilleurs résultats
 sorted_indices = np.argsort(similarity_scores)[::-1]  # Tri décroissant
 top_results = sorted_indices[:5]  # Afficher les 5 meilleurs résultats
 
+#puis on affiche les resultats
 print("\nRésultats de la recherche :")
 for idx in top_results:
     print(f"Score : {similarity_scores[idx]}, Document : {corpus.id2doc[idx + 1].titre}")
