@@ -11,6 +11,8 @@ from Classes import ArxivDocument
 from factory import RedditCorpusGenerator
 from factory import ArxivCorpusGenerator
 import pandas as pd
+import numpy as np
+from sklearn.metrics.pairwise import cosine_similarity
 
 # Connexion à l'API REDDIT
 reddit = praw.Reddit(client_id='k9t9Uh4CiOx2YbY1Fq1o4g', client_secret='WaaCVpa9njLgkCD1eOfwQo-OBS_sow', user_agent='td3Python')
@@ -145,15 +147,15 @@ def generate_corpus(generator, name):
 testSearchWord = "Fock"
 resSearchWord = corpus.search(testSearchWord)
 
-print('resultat de la recherche du mot ' + testSearchWord)
-for doc in resSearchWord:
-    print("\n - " + repr(doc))
+#print('resultat de la recherche du mot ' + testSearchWord)
+#for doc in resSearchWord:
+    #print("\n - " + repr(doc))
 
 #recherche par concordance
 testConcoWord = "Fock"
-print('\nresultat de la concordance du mot ' + testConcoWord)
+#print('\nresultat de la concordance du mot ' + testConcoWord)
 concordance_result = corpus.concordance("space")
-print(concordance_result)
+#print(concordance_result)
 
 #partie 2
 #2.1 (test de la fonction text_cleaner)
@@ -179,5 +181,47 @@ word_count_df = corpus.count_word_occurrences_with_document_frequency(voc)
 # Créez un DataFrame à partir du dictionnaire de fréquence des mots
 freq = pd.DataFrame(list(word_count_df.items()), columns=['Mot', 'Occurrences'])
 freq = freq.sort_values(by='Occurrences', key=lambda x: x.apply(lambda y: y['term freq']), ascending=False)
-print("\ndfWordDF : \n")
-print(freq)
+#print("\nfreq : \n")
+#print(freq)
+
+
+##### TD7 ####
+#2.1
+#print('voc avec term, id et total occurences')
+#print(voc)
+
+#2.2
+#ligne : doc - colonne mot donc exemple ligne 0 colonne 0 donne le nombre de fois que le mot d'index 0 dans le doc 0 apparait 
+tf_matrix = corpus.build_tf_matrix(voc)
+assert tf_matrix.shape[1] == len(voc), "La taille de la matrice ne correspond pas à la taille du vocabulaire"
+# Afficher la matrice de term frequency
+#print("Matrice de Term Frequency (TF):")
+#print(tf_matrix.toarray())
+
+#2.3 
+total_occurrences = tf_matrix.sum(axis=0)
+
+# Calculer le nombre total de documents contenant chaque mot
+doc_count = (tf_matrix > 0).sum(axis=0)
+
+vocab = dict(sorted(voc.items()))
+
+# Attribuer des indices commençant à 0
+for index, (word, info) in enumerate(vocab.items()):
+    info['id'] = index
+
+#assert min(info['id'] for info in voc.values()) == 0, "Les indices du vocabulaire ne commencent pas à 0"
+# Boucle pour chaque mot de vocab
+for word, info in vocab.items():
+    word_id = info['id']
+    info['total_occurrences'] = total_occurrences[0, word_id]
+    info['doc_count'] = doc_count[0, word_id]
+
+    #print(f"{word} : {info}")
+
+#Rappel : vocab est un dictionnaire contenant les mots, ainsi que leur id et leur total d'occurences dans le corpus
+
+# Accéder au mot à l'index ind dans le dictionnaire vocab
+index = 6
+w = next((mot for mot, info in vocab.items() if info['id'] == index), None)
+

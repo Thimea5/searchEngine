@@ -3,6 +3,7 @@ from Classes import Author
 from singleton import Singleton
 import re
 import pandas as pd
+from scipy.sparse import csr_matrix
 
 class Corpus(metaclass=Singleton):
     def __init__(self, nom):
@@ -72,26 +73,41 @@ class Corpus(metaclass=Singleton):
     
     def text_cleaner(self, texte):
         texte = texte.lower()
-
-        # Remplacer les passages à la ligne par un espace
-        texte = texte.replace("\n", " ")
-
-        # Supprimer la ponctuation
-        texte = re.sub(r'[^\w\s]', '', texte)
-
-        # Supprimer les chiffres
-        texte = re.sub(r'\d', '', texte)
+        texte = texte.replace("\n", " ") 
+        texte = re.sub(r'[^\w\s]', '', texte) #supprimer la ponctuation
+        texte = re.sub(r'\d', '', texte) #chiffre
 
         return texte
     
+    #td6
     def build_vocabulaire(self):
-        vocabulary = set()
+        #maj pour le td7
+        vocab = {}
         for doc in self.id2doc.values():
             text = self.text_cleaner(doc.texte)
-            words = text.split()  # Utilisez la fonction split pour diviser le texte en mots
+            words = text.split()
             cleaned_words = [self.text_cleaner(word) for word in words]
-            vocabulary.update(cleaned_words)  # Mise à jour de l'ensemble de vocabulaire avec les mots du document
-        return vocabulary
+
+            word_counts = {}
+            for word in cleaned_words:
+                if word not in word_counts:
+                    word_counts[word] = 1
+                else:
+                    word_counts[word] += 1
+
+            for word, count in word_counts.items():
+                if word not in vocab:
+                    vocab[word] = {
+                        'id': len(vocab) + 1,  # Identifiant unique, commence à 1
+                        'total_occurrences': count
+                    }
+                else:
+                    vocab[word]['total_occurrences'] += count
+
+        # Trier le dictionnaire par ordre alphabétique des mots
+        vocab = dict(sorted(vocab.items()))
+
+        return vocab
 
     #td6 2.3
     def count_word_occurrences(self, vocabulary):
@@ -116,3 +132,28 @@ class Corpus(metaclass=Singleton):
                     word_counts[word]['term freq'] += cleaned_words.count(word)  # Utilisez cleaned_words au lieu de words
                     word_counts[word]['document freq'] += 1
         return word_counts
+    
+    #td7 2.2
+    def build_tf_matrix(self, vocabulary):
+        # Initialiser une liste pour stocker les données, les indices de colonne et les indices de ligne
+        data = []
+        col_indices = []
+        row_indices = []
+
+        for doc_id, doc in self.id2doc.items():
+            # Nettoyer le texte du document
+            cleaned_text = self.text_cleaner(doc.texte)
+
+            # Compter les occurrences des mots dans le document
+            word_counts = {word: cleaned_text.split().count(word) for word in vocabulary}
+
+            # Ajouter les données à la liste
+            for word, count in word_counts.items():
+                data.append(count)
+                col_indices.append(vocabulary[word]['id'] - 1)  # Les indices de colonne commencent à 0
+                row_indices.append(doc_id - 1)  # Les indices de ligne commencent à 0
+
+        # Construire la matrice CSR sparse
+        tf_matrix = csr_matrix((data, (row_indices, col_indices)), shape=(len(self.id2doc), len(vocabulary)))
+
+        return tf_matrix
