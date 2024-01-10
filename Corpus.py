@@ -133,27 +133,32 @@ class Corpus(metaclass=Singleton):
                     word_counts[word]['document freq'] += 1
         return word_counts
     
-    #td7 2.2
     def build_tf_matrix(self, vocabulary):
-        # Initialiser une liste pour stocker les données, les indices de colonne et les indices de ligne
         data = []
         col_indices = []
         row_indices = []
 
         for doc_id, doc in self.id2doc.items():
-            # Nettoyer le texte du document
             cleaned_text = self.text_cleaner(doc.texte)
+            word_counts = {word: cleaned_text.split().count(word) for word in vocabulary if word in cleaned_text.split()}
 
-            # Compter les occurrences des mots dans le document
-            word_counts = {word: cleaned_text.split().count(word) for word in vocabulary}
-
-            # Ajouter les données à la liste
             for word, count in word_counts.items():
-                data.append(count)
-                col_indices.append(vocabulary[word]['id'] - 1)  # Les indices de colonne commencent à 0
-                row_indices.append(doc_id - 1)  # Les indices de ligne commencent à 0
+                if word in vocabulary:
+                    col_index = vocabulary[word]['id'] - 1  # Ajuster l'indice à 0
+                    #print(f"Word: {word}, Column Index: {col_index}")
+                    if 0 <= col_index < len(vocabulary):
+                        data.append(count)
+                        col_indices.append(col_index)
+                        row_indices.append(doc_id - 1)  # Soustraire 1 pour ajuster l'indice de ligne
+                    #else:
+                        #print(f"Invalid column index {col_index} for word {word}")
+                #else:
+                    #print(f"Word '{word}' not found in the vocabulary.")
 
-        # Construire la matrice CSR sparse
+        #print(f" row : {len(row_indices)}")
+        #print(f" col : {len(col_indices)}")
+        #print(f" vocabulary r  : {len(vocabulary)}")
+        #print(f" id2doc c: {len(self.id2doc)}")
+
         tf_matrix = csr_matrix((data, (row_indices, col_indices)), shape=(len(self.id2doc), len(vocabulary)))
-
         return tf_matrix
