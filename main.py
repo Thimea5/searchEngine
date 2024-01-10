@@ -13,6 +13,7 @@ from factory import ArxivCorpusGenerator
 import pandas as pd
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
+import tkinter as tk
 
 # Connexion à l'API REDDIT
 reddit = praw.Reddit(client_id='k9t9Uh4CiOx2YbY1Fq1o4g', client_secret='WaaCVpa9njLgkCD1eOfwQo-OBS_sow', user_agent='td3Python')
@@ -248,3 +249,37 @@ top_results = sorted_indices[:5]  # Afficher les 5 meilleurs résultats
 print("\nRésultats de la recherche :")
 for idx in top_results:
     print(f"Score : {similarity_scores[idx]}, Document : {corpus.id2doc[idx + 1].titre}")
+
+
+def valider():
+    print(subject.get())
+    print(keyWords.get())
+    text_area.delete("1.0", "end")
+    text_area.insert("1.0", "data ananana")
+    text_area.tag_configure("vert", foreground="green")
+    text_area.tag_add("vert", "1.0", "end")
+
+root = tk.Tk()
+root.geometry("600x800")
+root.title("Moteur de recherche M1 informatique")
+root.configure(bg="#201c1c")
+
+subject = tk.Entry(root,width=45, bg="black", fg="green")
+subject.place(x=17, y=60) 
+label = tk.Label(root, bg="#201c1c", fg="green", text="Entrée le sujet de rechercher")
+label.place(x=17, y=40)
+
+keyWords = tk.Entry(root,width=45, bg="black", fg="green")
+keyWords.place(x=17, y=100) 
+label = tk.Label(root, bg="#201c1c", fg="green", text="Entrée les mots clés (séparer par des virugles)")
+label.place(x=17, y=80)
+
+
+text_area = tk.Text(root, height=23, width=70, bg="black", fg="green")
+text_area.place(x=17, y=400) 
+
+
+button = tk.Button(root, text="Valider", bg="white", fg="black", command=lambda: valider())
+button.place(x=530, y=350)
+
+root.mainloop()
